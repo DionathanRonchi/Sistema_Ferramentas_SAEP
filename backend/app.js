@@ -7,6 +7,7 @@ server.use(cors());
 server.use(express.json());
 
 
+// ROTA GET / TODOS PRODUTOS
 server.get('/produtos', (req, res) => {
     const sql = 'SELECT * FROM PRODUTO';
     connection.query(sql, (err, results) => {
@@ -17,11 +18,7 @@ server.get('/produtos', (req, res) => {
     });
 });
 
-const PORT = 3025;
-server.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
-
+// ROTA GET / PRODUTOS ORDENADOS
 server.get('/produtos/ordenados', (req, res) => {
     const sql = 'SELECT * FROM PRODUTO ORDER BY NOME ASC';
     
@@ -33,5 +30,23 @@ server.get('/produtos/ordenados', (req, res) => {
     });
 });
 
+// ROTA GET / PRODUTO POR ID
+server.get('/produtos/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'SELECT * FROM PRODUTO WHERE id_produto = ?';
+    
+    connection.query(sql, [id], (err, resultados) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (resultados.length === 0) {
+            return res.status(404).json({ error: 'Produto não encontrado' });
+        }
+        return res.json(resultados[0]);
+    });
+});
 
-
+const PORT = 3025;
+server.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
