@@ -30,7 +30,7 @@ server.get('/produtos/ordenados', (req, res) => {
     });
 });
 
-// ROTA GET / PRODUTO POR ID
+// ROTA GET / PRODUTO POR  ID
 server.get('/produtos/:id', (req, res) => {
     const { id } = req.params;
     const sql = 'SELECT * FROM PRODUTO WHERE id_produto = ?';
