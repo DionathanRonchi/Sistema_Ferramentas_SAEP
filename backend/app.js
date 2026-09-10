@@ -6,6 +6,12 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+// Middleware para debug
+server.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    next();
+});
+
 
 // ROTA GET / TODOS PRODUTOS
 server.get('/produtos', (req, res) => {
@@ -30,7 +36,20 @@ server.get('/produtos/ordenados', (req, res) => {
     });
 });
 
-// ROTA GET / PRODUTO POR  ID
+// ROTA GET / BUSCAR PRODUTO POR NOME
+server.get('/produtos/buscar/:nome', (req, res) => {
+    const { nome } = req.params;
+    const sql = 'SELECT * FROM PRODUTO WHERE NOME LIKE ?';
+    
+    connection.query(sql, [`%${nome}%`], (err, resultados) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        return res.json(resultados);
+    });
+});
+
+// ROTA GET / PRODUTO POR ID
 server.get('/produtos/:id', (req, res) => {
     const { id } = req.params;
     const sql = 'SELECT * FROM PRODUTO WHERE id_produto = ?';
