@@ -65,6 +65,45 @@ server.get('/produtos/:id', (req, res) => {
     });
 });
 
+// CADASTRAR PRODUTO
+server.post('/produtos', (req, res) => {
+    const { nome, cor, textura, peso, unidade_medida, aplicacao, aplicação, data_validade,
+        estoque_minimo, estoque_atual, preco_unitario, id_categoria } = req.body;
+
+    const aplicacaoFinal = aplicacao ?? aplicação;
+
+    if (nome == null) {
+        return res.status(400).json({ error: 'O campo nome é obrigatório' });
+    }
+
+    if (cor == null || textura == null || peso == null || unidade_medida == null || aplicacaoFinal == null || data_validade == null || estoque_minimo == null || estoque_atual == null || preco_unitario == null || id_categoria == null) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    const sql = 'INSERT INTO PRODUTO (NOME, COR, TEXTURA, PESO, UNIDADE_MEDIDA, APLICACAO, DATA_VALIDADE, ESTOQUE_MINIMO, ESTOQUE_ATUAL, PRECO_UNITARIO, ID_CATEGORIA) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+    connection.query(sql, [nome, cor, textura, peso, unidade_medida, aplicacaoFinal, data_validade, estoque_minimo, estoque_atual, preco_unitario, id_categoria], (err, resultados) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        return res.status(201).json({
+            id: resultados.insertId,
+            nome,
+            cor,
+            textura,
+            peso,
+            unidade_medida,
+            aplicacao: aplicacaoFinal,
+            data_validade,
+            estoque_minimo,
+            estoque_atual,
+            preco_unitario,
+            id_categoria
+        });
+    });
+});
+
+
 const PORT = 3025;
 server.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
