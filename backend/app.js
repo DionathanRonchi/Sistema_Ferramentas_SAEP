@@ -103,6 +103,38 @@ server.post('/produtos', (req, res) => {
     });
 });
 
+// ATUALIZAR PRODUTO
+server.put('/produtos/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome, cor, textura, peso, unidade_medida, aplicacao, aplicação, data_validade,
+        estoque_minimo, estoque_atual, preco_unitario, id_categoria } = req.body;
+    const aplicacaoFinal = aplicacao ?? aplicação;
+
+    if (nome == null || cor == null || textura == null || peso == null || unidade_medida == null ||
+        aplicacaoFinal == null || data_validade == null || estoque_minimo == null || estoque_atual == null ||
+        preco_unitario == null || id_categoria == null) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    const sql = 'UPDATE PRODUTO SET NOME = ?, COR = ?, TEXTURA = ?, PESO = ?, UNIDADE_MEDIDA = ?, APLICACAO = ?, DATA_VALIDADE = ?, ESTOQUE_MINIMO = ?, ESTOQUE_ATUAL = ?, PRECO_UNITARIO = ?, ID_CATEGORIA = ? WHERE id_produto = ?';
+    connection.query('SELECT id_produto FROM PRODUTO WHERE id_produto = ?', [id], (err, produtos) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (produtos.length === 0) {
+            return res.status(404).json({ error: 'Produto não encontrado' });
+        }
+
+        connection.query(sql, [nome, cor, textura, peso, unidade_medida, aplicacaoFinal, data_validade, estoque_minimo,
+            estoque_atual, preco_unitario, id_categoria, id], (err) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            return res.json({ message: 'Produto atualizado com sucesso' });
+        });
+    });
+});
+
 
 const PORT = 3025;
 server.listen(PORT, () => {
